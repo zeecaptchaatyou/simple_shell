@@ -152,43 +152,50 @@ return (len);
 
 /**
  * _strtok - Tokenizes a string based on specified delimiters.
- * @str_ptr: A pointer to the input string. Will be modified during
- * tokenization.
+ * @str: The input string to be tokenized. Will be modified during tokenization.
  * @delimiters: A string containing delimiter characters.
  * Return: A pointer to the next token in the input string,
  * or NULL if no more tokens are found.
  */
-char *_strtok(char *str_ptr, const char *delimiters)
+char *_strtok(char *str, const char *delimiters)
 {
-static char *token_start, *token_end;
+    static char *token_start, *token_end;
 
-/* Check if the input string pointer is NULL or pointing to an empty string */
-if (str_ptr == NULL || *str_ptr == '\0')
-return (NULL);
+    /* Check if we're starting a new tokenization */
+    if (str != NULL)
+    {
+        /* Find the start of the token by skipping leading delimiters */
+        str += _strspn(str, delimiters);
 
+        /* Check if we've reached the end of the string */
+        if (*str == '\0')
+            return (NULL);
 
-/* Find the start of the token by skipping leading delimiters */
-str_ptr += _strspn(str_ptr, delimiters);
+        /* Find the end of the token */
+        token_start = str;
+        token_end = token_start + _strcspn(token_start, delimiters);
 
-/* Check if we've reached the end of the string */
+        /* Null-terminate the token */
+        if (*token_end != '\0')
+        {
+            *token_end = '\0';
+            token_end++;
+        }
+        else
+        {
+            token_end = NULL;
+        }
+    }
+    else if (token_end == NULL)
+    {
+        /* No more tokens left */
+        return (NULL);
+    }
 
-/* Find the end of the token */
-token_start = str_ptr;
-token_end = token_start + _strcspn(token_start, delimiters);
-
-/* Null-terminate the token and update the input string pointer */
-if (*token_end != '\0')
-{
-*token_end = '\0';
-str_ptr = token_end + 1;
+    return (token_start);
 }
-else
-str_ptr = NULL;
 
-return (token_start);
-}
-
-
+/*
 int main() {
     char str[] = "apple,banana,kiwi";
     char *delimiter = ",";
@@ -205,3 +212,4 @@ int main() {
     }
     return 0;
 }
+*/

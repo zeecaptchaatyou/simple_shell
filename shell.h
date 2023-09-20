@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <string.h>
 
+#define MAX_ARGS 16
 int _putchar(char c);
 char *_strchr(const char *str, int ch);
 int _strcmp(const char *str1, const char *str2);
@@ -15,5 +16,8 @@ char *_getenv(const char *name);
 int _strncmp(const char *str1, const char *str2, size_t n);
 size_t strspn(const char *s, const char *accept);
 char *_strtok(char *str_ptr, const char *delimiters);
+
+/*mainchicks functions */
+int parser(char * line, char **cmd_argv, char **envp);
 
 #endif
