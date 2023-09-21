@@ -1,56 +1,51 @@
 #include "shell.h"
 
 /**
- * main - just a simple shell..
- * @argc: you know what it is
- * @argv: do I even have to talk about this?
- * Return: 0
+ * main - a shell program
+ * @argc: argument counter
+ * @argv: array of argument vectors
+ * @env: an array of environmental variables (envp)
+ * Return: will be back to update this
 */
-int main(int argc, char **argv, char **envp)
+int main(int argc, char *argv[], char *env[])
 {
-char *line = NULL, *token;
-size_t line_len = 0;
-int chars_read, token_counter = 0, status;
-char *const cmd_argv[MAX_ARGS];
-pid_t child_pid;
+int *status, count = 0, non_interactive = 1, s = 0, op_mode;
+char *cmd, **cmd_lists, **cmd_arr = NULL;
+list_paths *current;
+status = &s;
+op_mode = mode_checker(argc);
 
-if (envp[0] == NULL)
-return (0);
-
-while (1)
+if (op_mode != INTERACTIVE_MODE)/*checking the file after the command*/
+cmd_lists = scan_command_files(op_mode, argv[1], argv[0]);
+current = paths_to_linkedlist();/*turning the path current to a linked */
+while (non_interactive && ++count)
 {
-_putchar(36);
-
-chars_read = getline(&line, &line_len, stdin);
-
-if (chars_read == -1)
+if (op_mode == NON_INTERACTIVE_MODE || op_mode == NON_INTERACTIVE_PIPE)
 {
-perror("omo");
+if (cmd_lists[count - 1])
+cmd = cmd_lists[count - 1];
+else
+{ free(cmd_lists);
 break;
-}
+}} else if (op_mode == INTERACTIVE_MODE)
+cmd = scan_userInput(current); /*prompt user&get command*/
+if (!cmd)
+continue;
+cmd_arr = line_parser(cmd, *status);
+if (!cmd_arr)
+{
+free(cmd);
+continue; }
+if (dir_check(cmd_arr[0], argv, count, cmd_arr, status, cmd) == 0)
+continue;
+if (builtin_handler(cmd, cmd_arr, current, argv[0],
+count, status, NULL, cmd_lists, argv) != 0)
+non_builtin_cmd_handler(cmd_arr, env, status, count, current, argv);
+free_all(cmd, cmd_arr); }
+free_list(current);
+exit(*status); }
 
-status = parser(line, cmd_argv, envp);
-if (status == EXIT_FAILURE)
-/*put some error message here, Zee....don't forgettttt*/
-char *blah = "I'm just filling up space....like BP does with the K-pop industry cracks";
-free(line);
-line = NULL;
-}
-
-return (0);
-}
-
-
-/**
- * when you wake up:
- * test all this stuff you have written, manage errors and try to run this code with the -Wall -pedantic -Werror -Wextra flags Mr Barbier tortures us with
- * remember Zee, your brain can handle much more than Family Guy and Harry
- * Potter memes. it isn't just meant for Backstreet music, you can write some
- * code with it 🥹🥹.
- * Don't mess up, Zee....now, go to sleep and come back!
- * 
- * 
- * 
- * I'll still look at some Puns before I sleep tho 😭😭....hopeless is the word.
- * YEAH. BYE. YEAH.
-*/
+/*
+ * when I'm done with this, I'll try myself to 10 episodes of family guy
+ * and finally play with Node.js 🥹🥹🥹🥹.....fourteen days!
+ */
